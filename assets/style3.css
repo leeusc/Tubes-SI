@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+
+.prof-mahasiswa {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid gray;
+    padding: 1em;
+    width: 450px;
+    max-width: 100%;
+    background-color: #F6F6F6;
+    font-family: 'Source Code Pro', monospace;
+    gap: 0.5em;
+    border: 1.5px solid #c5c4c4;
+    border-radius: 10px;
+}
+
+.prof-mahasiswa header {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    border: 1.5px solid #c5c4c4;
+    border-radius: 10px;
+}
+
+.card-title {
+    background-color: #FCFCFC;
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5em;
+    border-radius: 10px;
+    /* border: 1.5px solid #c5c4c4; */
+}
+
+.left-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+.left-group div {
+    display: flex;
+    align-items: center;
+    background-color: #f7e6e1;
+    border-radius: 10px;
+    border: 2px solid #e97a3a;
+    color: #e97a3a;
+    gap: 0.5em;
+    padding: 0.1em 0.2em;
+    font-size: 0.8em;
+}
+
+.identity {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    padding: 0.5em;
+    background-color: #FCFCFC;
+    border-top: 1.5px solid #c5c4c4;;
+    border-radius: 10px;
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #afaeae;
+}
+
+.input {
+    white-space: nowrap;         /* prevent wrapping */
+    overflow: hidden;            /* hide overflowing text */
+    text-overflow: ellipsis;     /* show "..." at the end */
+    max-width: 60%;             /* optional, ensure it respects container */
+}
+
+.matkul {
+    display: flex;
+    flex-direction: column;    
+    gap: 1em;
+    padding: 1.5em;
+    font-family: 'Source Code Pro', monospace;    
+    margin: 2em auto;
+
+    background-color: #ffffff;           /* white card */
+    border: 1px solid #ddd;              /* light gray border */
+    border-radius: 12px;                 /* rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* subtle shadow */
+}
+
+.matkul header {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.matkul header span {
+    background: linear-gradient(
+        to right,
+        #f58529,  /* orange/red */
+        #dd2a7b,  /* pink/purple */
+        #8134af,  /* deep purple */
+        #515bd4   /* blue */
+    );
+    -webkit-background-clip: text;  /* make gradient visible on text */
+    -webkit-text-fill-color: transparent; /* hide original text color */
+    display: inline-block; /* ensures proper rendering */
+}
+
+
+.matkul-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+}
+
+.matkul-list li {
+    display: flex;
+    gap: 0.5em;
+    flex-direction: column;
+}
+
+.scores {
+    display: flex;
+    gap: 0.5rem;
+}
+
+ul {
+    list-style: none; /* remove bullets/numbers */
+    padding: 0;       /* remove default padding */
+    margin: 0;        /* remove default margin */
+}
+
+li {
+    margin: 0;        /* optional: remove spacing between items */
+    padding: 0;       /* optional: remove padding */
+}
+
+.matkul-list hr {
+    border: none; /* remove default border */
+    height: 3px;  /* thickness of the line */
+    background: linear-gradient(
+        to right,
+        #f58529,   /* orange/red */
+        #dd2a7b,   /* pink/purple */
+        #8134af,   /* deep purple */
+        #515bd4    /* blue */
+    );
+    border-radius: 5px; /* optional: rounded edges */
+}
+
+
+.course-name {
+    font-weight:600;
+}
+
