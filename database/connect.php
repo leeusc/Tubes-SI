@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$dbname = "your_database";
+$dbname = "unidb";
 
 $conn = mysqli_connect($host, $user, $pass, $dbname);
 

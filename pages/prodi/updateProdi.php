@@ -1,4 +1,4 @@
-<form action="">
+<form action="" method="POST">
     <h2>Tambah Prodi</h2>
     <div>
         <label for="nama_prodi">Nama Prodi</label>
