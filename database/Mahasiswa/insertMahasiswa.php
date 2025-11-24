@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    $keyData = require 'config.php';
+    $keyData = require '../config.php';
     $key = base64_decode($keyData['key']);
     $cipher = "AES-256-CBC";
     $ivlen = openssl_cipher_iv_length($cipher);
