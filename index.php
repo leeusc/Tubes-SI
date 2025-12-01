@@ -20,6 +20,9 @@ switch($page){
     case 'update-prodi':
         include "pages/prodi/updateProdi.php";
         break;
+    case 'profile-prodi';
+        include "pages/prodi/profileProdi.php";
+        break;
     case 'menu-mahasiswa':
         include "pages/mahasiswa/menuMahasiswa.php";
         break;
