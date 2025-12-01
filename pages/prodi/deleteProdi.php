@@ -11,10 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['kd_prodi'])) {
         $stmt->close();
         $conn->close();
         // Redirect back to menu-prodi page
-        header("Location: index.php?page=menu-prodi");
+        header("Location: /Tugas-SI/index.php?page=menu-prodi");
         exit;
     } else {
         echo "Error: " . $stmt->error;
     }
 }
-?>

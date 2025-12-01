@@ -52,6 +52,7 @@
             $resultProdi = $stmtProdi->get_result();
             $prodi = $resultProdi->fetch_assoc();
             ?>
+
             <a href="index.php?page=profile-mahasiswa&nim=<?= urlencode($row['NIM']) ?>" class="list-mahasiswa">
                 <h5><?php echo htmlspecialchars($nama) ?></h5>
                 <h5><?php echo htmlspecialchars($prodi['nama_prodi']) ?></h5>
@@ -61,6 +62,7 @@
                     <button type="submit" class="mahasiswa-delete" onclick="event.stopPropagation()">Hapus</button>
                 </form>
             </a>
+            
         <?php endwhile; ?>
 
     </div>

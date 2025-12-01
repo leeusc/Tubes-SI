@@ -40,11 +40,11 @@ $result = $conn->query("SELECT * FROM prodi");
                     </button>
 
                     <!-- Delete form -->
-                    <form action="delete-prodi.php" method="POST" style="display:inline;" 
-                          onsubmit="return confirm('Hapus prodi <?= htmlspecialchars($row['nama_prodi']) ?>?')">
-                        <input type="hidden" name="kd_prodi" value="<?= $row['kd_prodi'] ?>">
+                    <form method="POST" action="/Tugas-SI/pages/prodi/deleteProdi.php" style="flex-shrink: 0; margin: 0; padding: 0; width: auto; display: inline-block; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Yakin ingin menghapus?')">
+                        <input type="hidden" name="kd_prodi" value="<?= htmlspecialchars($row['kd_prodi']) ?>">
                         <button type="submit" class="prodi-delete">Delete</button>
                     </form>
+                    
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
