@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? "SIA School" ?></title>
 
-    <link rel="stylesheet" href="assets/style.css">
+    <!-- <link rel="stylesheet" href="assets/style.css">
     <link rel="stylesheet" href="assets/style2.css">
     <link rel="stylesheet" href="assets/form.css">
-    <link rel="stylesheet" href="assets/style3.css">
+    <link rel="stylesheet" href="assets/style3.css"> -->
+
+
+    <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
+<link rel="stylesheet" href="assets/style2.css?v=<?= time() ?>">
+<link rel="stylesheet" href="assets/form.css?v=<?= time() ?>">
+<link rel="stylesheet" href="assets/style3.css?v=<?= time() ?>">
+
     
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />

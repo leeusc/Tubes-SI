@@ -1,4 +1,4 @@
-<?php 
+<?php
 include __DIR__ . "/../../database/connect.php";
 
 // fetch all prodi
@@ -31,25 +31,31 @@ $result = $conn->query("SELECT * FROM prodi");
 
         <?php if ($result->num_rows > 0): ?>
             <?php while ($row = $result->fetch_assoc()): ?>
-                <div class="list-prodi">
+                <div class="list-prodi"
+                    onclick="window.location.href='index.php?page=profile-prodi&id=<?= $row['kd_prodi'] ?>'">
+
                     <h5><?= htmlspecialchars($row['nama_prodi']) ?></h5>
 
                     <!-- Update button -->
-                    <button class="prodi-update" onclick="location.href='index.php?page=update-prodi&id=<?= $row['kd_prodi'] ?>'">
+                    <button class="prodi-update"
+                        onclick="event.stopPropagation(); window.location.href='index.php?page=update-prodi&id=<?= $row['kd_prodi'] ?>'">
                         Update
                     </button>
 
                     <!-- Delete form -->
-                    <form method="POST" action="/Tugas-SI/pages/prodi/deleteProdi.php" style="flex-shrink: 0; margin: 0; padding: 0; width: auto; display: inline-block; background: none; border: none; box-shadow: none;" onsubmit="return confirm('Yakin ingin menghapus?')">
+                    <form method="POST" action="/Tugas-SI/pages/prodi/deleteProdi.php"
+                        style="flex-shrink: 0; margin: 0; padding: 0; width: auto; display: inline-block; background: none; border: none; box-shadow: none;"
+                        onsubmit="event.stopPropagation(); return confirm('Yakin ingin menghapus?')">
+
                         <input type="hidden" name="kd_prodi" value="<?= htmlspecialchars($row['kd_prodi']) ?>">
                         <button type="submit" class="prodi-delete">Delete</button>
                     </form>
-                    
                 </div>
+
+
             <?php endwhile; ?>
         <?php else: ?>
             <p>Tidak ada prodi.</p>
         <?php endif; ?>
     </div>
-
 </main>

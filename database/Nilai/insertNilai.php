@@ -11,63 +11,74 @@ function calculateGrade($nilai) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     // Validate input
     if (empty($_POST['nilai']) || empty($_POST['nim']) || empty($_POST['kd_matkul'])) {
-        header("Location: ../../index.php?page=insert-nilai&error=missing_fields");
+        header("Location: ../../index.php?page=profile&nim=" . urlencode($_POST['nim']) . "&error=missing_fields");
         exit();
     }
 
+    $nim = $_POST['nim'];
+    $kd_matkul = $_POST['kd_matkul'];
+    $nilai_numeric = $_POST['nilai'];
+
+    // Load encryption key
     $keyData = require '../Mahasiswa/config.php';
     $key = base64_decode($keyData['key']);
     $cipher = "AES-256-CBC";
-    $ivlen = openssl_cipher_iv_length($cipher);
-    $iv = random_bytes($ivlen);
+    $ivlen = openssl_cipher_iv_length($cipher); // 16 bytes for AES-256-CBC
 
-    $nilai_numeric = $_POST['nilai'];
+    // Calculate grade
     $grade_letter = calculateGrade($nilai_numeric);
 
+    // Check if nilai already exists
+    $check = $conn->prepare("SELECT * FROM nilai WHERE NIM=? AND kd_matkul=?");
+    $check->bind_param("ss", $nim, $kd_matkul);
+    $check->execute();
+    $resultCheck = $check->get_result();
+    if ($resultCheck->num_rows > 0) {
+        $check->close();
+        $conn->close();
+        header("Location: ../../index.php?page=profile&nim=" . urlencode($nim) . "&error=nilai_exists");
+        exit();
+    }
+    $check->close();
+
     // Encrypt nilai
-    $encrypted_nilai = openssl_encrypt($nilai_numeric, $cipher, $key, OPENSSL_RAW_DATA, $iv);
-    $nilai_encrypted = $iv . $encrypted_nilai;
+    $iv_nilai = random_bytes($ivlen); // must be exactly 16 bytes
+    $enc_nilai = openssl_encrypt($nilai_numeric, $cipher, $key, OPENSSL_RAW_DATA, $iv_nilai);
+    $nilai_encrypted = $iv_nilai . $enc_nilai;
 
     // Encrypt grade
     $iv_grade = random_bytes($ivlen);
-    $encrypted_grade = openssl_encrypt($grade_letter, $cipher, $key, OPENSSL_RAW_DATA, $iv_grade);
-    $grade_encrypted = $iv_grade . $encrypted_grade;
+    $enc_grade = openssl_encrypt($grade_letter, $cipher, $key, OPENSSL_RAW_DATA, $iv_grade);
+    $grade_encrypted = $iv_grade . $enc_grade;
 
-    $nim = $_POST['nim'];
-    $kd_matkul = $_POST['kd_matkul'];
-
-    $query = "INSERT INTO nilai (NIM, kd_matkul, nilai, grade) VALUES (?, ?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    
+    // Insert into database
+    $stmt = $conn->prepare("INSERT INTO nilai (NIM, kd_matkul, nilai, grade) VALUES (?, ?, ?, ?)");
     if (!$stmt) {
-        header("Location: ../../index.php?page=insert-nilai&error=prepare_failed");
+        $conn->close();
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
         exit();
     }
 
     $stmt->bind_param("ssss", $nim, $kd_matkul, $nilai_encrypted, $grade_encrypted);
-    
+
     if ($stmt->execute()) {
         $stmt->close();
         $conn->close();
-        header("Location: ../../index.php?page=menu-nilai&success=inserted");
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
         exit();
     } else {
-        $error_code = $stmt->errno;
         $stmt->close();
         $conn->close();
-        
-        // Check for duplicate entry error (MySQL error 1062)
-        if ($error_code === 1062) {
-            header("Location: ../../index.php?page=insert-nilai&error=duplicate_nim");
-        } else {
-            header("Location: ../../index.php?page=insert-nilai&error=insert_failed");
-        }
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
         exit();
     }
+
 } else {
-    header("Location: ../../index.php?page=menu-nilai");
+    // If not POST, redirect to profile
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
     exit();
 }
 ?>

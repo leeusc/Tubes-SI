@@ -34,7 +34,13 @@ switch($page){
         break;
     case 'update-mahasiswa':
         include "pages/mahasiswa/updateMahasiswa.php";
-        break;       
+        break;
+    case 'insert-matkul';
+        include "pages/prodi/matkul/insertMatkul.php";
+        break;
+    case 'update-matkul';
+        include "pages/prodi/matkul/updateMatkul.php";
+        break;              
 }
 ?>
 

@@ -1,53 +1,55 @@
 <?php
-    $nim = $_GET['nim'] ?? '';
-    
-    if (empty($nim)) {
-        header("Location: index.php?page=menu-mahasiswa&error=missing_nim");
-        exit();
-    }
-    
-    include 'database/connect.php';
-    
-    // Fetch mahasiswa data
-    $query = "SELECT m.*, p.nama_prodi FROM mahasiswa m 
+$nim = $_GET['nim'] ?? '';
+
+if (empty($nim)) {
+    header("Location: index.php?page=menu-mahasiswa&error=missing_nim");
+    exit();
+}
+
+include 'database/connect.php';
+
+// Fetch mahasiswa data
+$query = "SELECT m.*, p.nama_prodi FROM mahasiswa m 
               LEFT JOIN prodi p ON m.kd_prodi = p.kd_prodi 
               WHERE m.NIM = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $nim);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $mahasiswa = $result->fetch_assoc();
-    $stmt->close();
-    
-    if (!$mahasiswa) {
-        $conn->close();
-        header("Location: index.php?page=menu-mahasiswa&error=mahasiswa_not_found");
-        exit();
-    }
-    
-    // Get encryption key for decryption
-    $keyData = require 'database/Mahasiswa/config.php';
-    $key = base64_decode($keyData['key']);
-    $cipher = "AES-256-CBC";
-    
-    // Decrypt nama
-    $encrypted_data = $mahasiswa['nama_mhs'];
-    $ivlen = openssl_cipher_iv_length($cipher);
-    $iv = substr($encrypted_data, 0, $ivlen);
-    $encrypted_nama = substr($encrypted_data, $ivlen);
-    $nama = openssl_decrypt($encrypted_nama, $cipher, $key, OPENSSL_RAW_DATA, $iv);
-    
-    // Fetch nilai (grades) for this student
-    $queryNilai = "SELECT n.*, mk.nama_matkul, mk.SKS 
-                   FROM nilai n 
-                   JOIN matkul mk ON n.kd_matkul = mk.kd_matkul 
-                   WHERE n.NIM = ?";
-    $stmtNilai = $conn->prepare($queryNilai);
-    $stmtNilai->bind_param("s", $nim);
-    $stmtNilai->execute();
-    $resultNilai = $stmtNilai->get_result();
-    $stmtNilai->close();
+$stmt = $conn->prepare($query);
+$stmt->bind_param("s", $nim);
+$stmt->execute();
+$result = $stmt->get_result();
+$mahasiswa = $result->fetch_assoc();
+$stmt->close();
+
+if (!$mahasiswa) {
     $conn->close();
+    header("Location: index.php?page=menu-mahasiswa&error=mahasiswa_not_found");
+    exit();
+}
+
+// Get encryption key for decryption
+$keyData = require 'database/Mahasiswa/config.php';
+$key = base64_decode($keyData['key']);
+$cipher = "AES-256-CBC";
+
+// Decrypt nama
+$encrypted_data = $mahasiswa['nama_mhs'];
+$ivlen = openssl_cipher_iv_length($cipher);
+$iv = substr($encrypted_data, 0, $ivlen);
+$encrypted_nama = substr($encrypted_data, $ivlen);
+$nama = openssl_decrypt($encrypted_nama, $cipher, $key, OPENSSL_RAW_DATA, $iv);
+
+// Fetch nilai (grades) for this student
+$queryNilai = "SELECT mk.kd_matkul, mk.nama_matkul, mk.SKS, 
+                      n.nilai AS encrypted_nilai, n.grade AS encrypted_grade
+               FROM matkul mk
+               LEFT JOIN nilai n 
+                   ON mk.kd_matkul = n.kd_matkul AND n.NIM = ?";
+
+$stmtNilai = $conn->prepare($queryNilai);
+$stmtNilai->bind_param("s", $nim);
+$stmtNilai->execute();
+$resultNilai = $stmtNilai->get_result();
+$stmtNilai->close();
+$conn->close();
 ?>
 
 <main class="prof-mahasiswa">
@@ -127,34 +129,72 @@
         <span class="material-symbols-outlined">
             subject
         </span>
-        
-            <h3>MataKuliah</h3>
+
+        <h3>MataKuliah</h3>
     </header>
     <ul class="matkul-list">
-        <?php if ($resultNilai->num_rows > 0): ?>
-            <?php while ($nilai = $resultNilai->fetch_assoc()): ?>
-                <?php
-                // Decrypt nilai and grade
-                $encrypted_nilai = $nilai['nilai'];
-                $iv_nilai = substr($encrypted_nilai, 0, $ivlen);
-                $encrypted_nilai_data = substr($encrypted_nilai, $ivlen);
+        <?php while ($nilai = $resultNilai->fetch_assoc()): ?>
+            <?php
+            // Decrypt nilai
+            if (!empty($nilai['encrypted_nilai'])) {
+                $iv_nilai = substr($nilai['encrypted_nilai'], 0, $ivlen);
+                $encrypted_nilai_data = substr($nilai['encrypted_nilai'], $ivlen);
                 $nilai_decrypted = openssl_decrypt($encrypted_nilai_data, $cipher, $key, OPENSSL_RAW_DATA, $iv_nilai);
-                
-                $encrypted_grade = $nilai['grade'];
-                $iv_grade = substr($encrypted_grade, 0, $ivlen);
-                $encrypted_grade_data = substr($encrypted_grade, $ivlen);
+            } else {
+                $nilai_decrypted = null;
+            }
+
+            // Decrypt grade
+            if (!empty($nilai['encrypted_grade'])) {
+                $iv_grade = substr($nilai['encrypted_grade'], 0, $ivlen);
+                $encrypted_grade_data = substr($nilai['encrypted_grade'], $ivlen);
                 $grade_decrypted = openssl_decrypt($encrypted_grade_data, $cipher, $key, OPENSSL_RAW_DATA, $iv_grade);
-                ?>
-                <li>
-                    <span class="course-name"><?php echo htmlspecialchars($nilai['nama_matkul']); ?> (<?php echo htmlspecialchars($nilai['SKS']); ?> SKS)</span>
-                    <ul class="scores">
-                        <li>Nilai: <?php echo htmlspecialchars($nilai_decrypted); ?> | Grade: <?php echo htmlspecialchars($grade_decrypted); ?></li>
-                    </ul>
-                </li>
-                <hr>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <li>Belum ada data nilai untuk mahasiswa ini.</li>
-        <?php endif; ?>
+            } else {
+                $grade_decrypted = null;
+            }
+            ?>
+
+            <li>
+                <span class="course-name">
+                    <?= htmlspecialchars($nilai['nama_matkul']) ?> (<?= htmlspecialchars($nilai['SKS']) ?> SKS)
+                </span>
+                <ul class="scores">
+                    <li>
+                        Nilai: <?= htmlspecialchars($nilai_decrypted ?? 'Belum diinput') ?> |
+                        Grade: <?= htmlspecialchars($grade_decrypted ?? 'Belum diinput') ?>
+
+                        <?php if ($nilai_decrypted === null): ?>
+                            <!-- Insert form -->
+                            <form action="/Tugas-SI/database/Nilai/insertNilai.php" method="POST" class="form-nilai">
+                                <input type="hidden" name="nim" value="<?= htmlspecialchars($nim) ?>">
+                                <input type="hidden" name="kd_matkul" value="<?= htmlspecialchars($nilai['kd_matkul']) ?>">
+                                <input type="number" name="nilai" min="0" max="100" placeholder="Nilai" required
+                                    style="width:50px; padding:2px 4px; font-size:0.85rem;">
+                                <button type="submit" style="padding:2px 6px; font-size:0.85rem;">+</button>
+                            </form>
+                        <?php else: ?>
+                            <!-- Update/Delete links -->
+                            <form action="/Tugas-SI/database/Nilai/updateNilai.php" method="POST" class="form-nilai" style="display:inline-flex;">
+                                <input type="hidden" name="nim" value="<?= htmlspecialchars($nim) ?>">
+                                <input type="hidden" name="kd_matkul" value="<?= htmlspecialchars($nilai['kd_matkul']) ?>">
+                                <input type="number" name="nilai" min="0" max="100" value="<?= htmlspecialchars($nilai_decrypted) ?>"
+                                    style="width:50px; padding:2px 4px; font-size:0.85rem;">
+                                <button type="submit" style="padding:2px 6px; font-size:0.85rem;">Update</button>
+                            </form>
+
+                            <form action="/Tugas-SI/database/Nilai/deleteNilai.php" method="POST" class="form-nilai">
+                                <input type="hidden" name="nim" value="<?= htmlspecialchars($nim) ?>">
+                                <input type="hidden" name="kd_matkul" value="<?= htmlspecialchars($nilai['kd_matkul']) ?>">
+                                <button type="submit" onclick="return confirm('Yakin ingin menghapus nilai ini?');"
+                                    style="padding:2px 6px; font-size:0.85rem;">Delete</button>
+                            </form>
+
+                        <?php endif; ?>
+                    </li>
+                </ul>
+            </li>
+            <hr>
+        <?php endwhile; ?>
     </ul>
+
 </main>

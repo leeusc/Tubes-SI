@@ -49,3 +49,30 @@ form button {
 form h2 {
     color: #112D53;
 }
+
+.form-nilai {
+    all: unset; /* reset almost all inherited styles */
+    display: inline-flex; /* inline with text */
+    align-items: center; /* vertically center input + button */
+    gap: 4px; /* small space between input & button */
+    margin: 0; /* remove margin */
+}
+
+.form-nilai input {
+    all: unset; /* reset input styles */
+    width: 1em;
+    padding: 1em;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-nilai button {
+    all: unset; /* reset button styles */
+    padding: 2px 6px;
+    font-size: 0.85rem;
+    background-color: #112D53;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare($query);
     
     if (!$stmt) {
-        header("Location: ../../index.php?page=menu-nilai&error=delete_failed");
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
         exit();
     }
 
@@ -25,17 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         $stmt->close();
         $conn->close();
-        header("Location: ../../index.php?page=menu-nilai&success=deleted");
+        
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
         exit();
     } else {
         $stmt->close();
         $conn->close();
-        header("Location: ../../index.php?page=menu-nilai&error=delete_failed");
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
         exit();
     }
 } else {
     // Reject non-POST requests
-    header("Location: ../../index.php?page=menu-nilai&error=invalid_request");
+        header("Location: ../../index.php?page=profile-mahasiswa&nim=" . urlencode($nim));
     exit();
 }
 ?>
